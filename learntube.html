@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Learntube</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+:root{--bg:#eef2f7;--surface:#fff;--ink:#14213d;--muted:#5b6784;--line:#d5dce8;--accent:#0e7c86;--mark:#ffd60a;--on-accent:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1722;--surface:#18222f;--ink:#e8edf5;--muted:#9aa7bd;--line:#2a3646;--accent:#3cc3cf;--on-accent:#06242a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1722;--surface:#18222f;--ink:#e8edf5;--muted:#9aa7bd;--line:#2a3646;--accent:#3cc3cf;--on-accent:#06242a;color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.55 "Source Sans 3",system-ui,sans-serif}
+h1,h2,h3{font-family:"Bricolage Grotesque",system-ui,sans-serif;line-height:1.15;margin:0 0 .5rem}
+h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:800}
+h2{font-size:1.5rem}h3{font-size:1.05rem}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--mark);outline-offset:2px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:.75rem 1.25rem;align-items:center;padding:.7rem 1rem}
+.logo{font:800 1.35rem "Bricolage Grotesque",sans-serif;text-decoration:none;color:var(--ink)}
+.logo span{background:linear-gradient(transparent 55%,var(--mark) 55%)}
+nav{display:flex;gap:.25rem;flex-wrap:wrap}
+nav a{padding:.4rem .8rem;border-radius:8px;text-decoration:none;color:var(--muted);font-weight:600}
+nav a[aria-current="page"]{color:var(--ink);background:var(--bg)}
+.sf{flex:1;min-width:200px;display:flex;gap:.4rem;max-width:460px;margin-left:auto}
+input,textarea,select,button{font:inherit;color:inherit}
+input,textarea,select{width:100%;padding:.55rem .7rem;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+button,.btn{background:var(--accent);color:var(--on-accent);border:0;border-radius:8px;padding:.55rem 1rem;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block}
+button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+main{max-width:1100px;margin:0 auto;padding:1.5rem 1rem 4rem}
+.hero{padding:2rem 0 1.5rem;max-width:40rem}
+.hero p{color:var(--muted);font-size:1.15rem}
+.chips{display:flex;gap:.5rem;flex-wrap:wrap;margin:1rem 0}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:.25rem .8rem;cursor:pointer;font-size:.9rem}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1.1rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.card .b{padding:.8rem 1rem 1rem}
+.thumb{aspect-ratio:16/9;display:flex;align-items:flex-end;padding:.7rem;color:#fff;font:800 1.2rem "Bricolage Grotesque",sans-serif}
+.meta{color:var(--muted);font-size:.9rem}
+.cols{display:grid;grid-template-columns:minmax(0,1fr);gap:1.25rem}
+@media(min-width:800px){.cols{grid-template-columns:300px minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1rem}
+.stack>*+*{margin-top:.75rem}
+.item{display:flex;gap:.6rem;align-items:center;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--line)}
+.item.sel{font-weight:700}
+.answer{border-left:4px solid var(--mark);padding:.4rem .9rem;background:var(--bg);border-radius:0 8px 8px 0}
+.done{text-decoration:line-through;color:var(--muted)}
+.tag{font-size:.8rem;background:var(--bg);border-radius:6px;padding:.1rem .5rem;color:var(--muted)}
+.empty{color:var(--muted);padding:1rem 0}
+footer{text-align:center;color:var(--muted);font-size:.85rem;padding:2rem 1rem}
+@media(prefers-reduced-motion:no-preference){button{transition:filter .15s}button:hover{filter:brightness(1.1)}}
+</style>
+</head>
+<body>
+<header>
+<a class="logo" href="#home"><span>Learn</span>tube</a>
+<nav aria-label="Main"><a href="#home" data-n="home">Videos</a><a href="#notebook" data-n="notebook">Notebook</a><a href="#classes" data-n="classes">Classes</a></nav>
+<form class="sf" id="sf" role="search"><input id="q" type="search" placeholder="Search videos, notes, classes" aria-label="Search"><button>Search</button></form>
+<button class="ghost" id="theme" aria-label="Switch light or dark theme">Theme</button>
+</header>
+<main id="app"></main>
+<footer>Learntube keeps everything in this browser. Videos open on YouTube.</footer>
+<script>
+const VIDEOS=[
+{t:"How photosynthesis turns light into sugar",c:"Biology Basics",s:"Science",d:"9:40",h:150,x:"Plants capture light in chloroplasts and use it to build glucose from carbon dioxide and water."},
+{t:"Solving quadratic equations step by step",c:"Math Made Clear",s:"Math",d:"12:05",h:220,x:"Factoring, completing the square and the quadratic formula, with worked examples."},
+{t:"Causes of the French Revolution",c:"History Hour",s:"History",d:"15:30",h:10,x:"Taxes, bread prices and Enlightenment ideas set the stage for 1789."},
+{t:"Intro to Python: variables and loops",c:"Code Campus",s:"Coding",d:"18:20",h:265,x:"Write your first programs with variables, conditions and for loops."},
+{t:"The water cycle explained",c:"Biology Basics",s:"Science",d:"6:15",h:195,x:"Evaporation, condensation and precipitation move water around the planet."},
+{t:"Essay writing: thesis statements that work",c:"Write Right",s:"Language",d:"8:50",h:35,x:"Build a clear, arguable thesis and structure paragraphs around it."},
+{t:"Newton's three laws of motion",c:"Physics Plain",s:"Science",d:"11:10",h:300,x:"Inertia, force equals mass times acceleration, and action and reaction."},
+{t:"Fractions, decimals and percentages",c:"Math Made Clear",s:"Math",d:"10:00",h:100,x:"Convert between the three forms and compare quantities quickly."}];
+const store={get(){try{return JSON.parse(localStorage.getItem("learntube-v1"))}catch(e){return null}},set(v){try{localStorage.setItem("learntube-v1",JSON.stringify(v))}catch(e){}}};
+let S=store.get()||{sources:[],classes:[{id:1,name:"Biology 101",code:"BIO-7Q2",work:[{id:1,title:"Read chapter 3 and write a summary",due:"2026-11-05",done:false}]}],sel:null,csel:1};
+const save=()=>store.set(S);
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const app=$("#app");let subj="All",nbOut="",nbQ="";
+const STOP=new Set("this that with from have they their there which would about were been into than then them these those also when what your some such more most other only over very will just".split(" "));
+const sents=t=>(t.match(/[^.!?\n]+[.!?]?/g)||[]).map(s=>s.trim()).filter(s=>s.length>25);
+const words=t=>(t.toLowerCase().match(/[a-z']{4,}/g)||[]).filter(w=>!STOP.has(w));
+function freq(t){const f={};words(t).forEach(w=>f[w]=(f[w]||0)+1);return f}
+function summarize(t){const f=freq(t),ss=sents(t);return ss.map((s,i)=>({s,i,sc:words(s).reduce((a,w)=>a+(f[w]||0),0)/Math.sqrt(words(s).length||1)})).sort((a,b)=>b.sc-a.sc).slice(0,3).sort((a,b)=>a.i-b.i).map(o=>o.s)}
+function ask(q){const qw=new Set(words(q));const hits=[];S.sources.forEach(src=>sents(src.text).forEach(s=>{const sc=words(s).filter(w=>qw.has(w)).length;if(sc)hits.push({s,sc,n:src.title})}));return hits.sort((a,b)=>b.sc-a.sc).slice(0,3)}
+function guide(t){const f=freq(t),terms=Object.entries(f).sort((a,b)=>b[1]-a[1]).slice(0,6).map(e=>e[0]);const qs=sents(t).filter(s=>terms.some(k=>s.toLowerCase().includes(k))).slice(0,4).map(s=>{const k=terms.find(k=>s.toLowerCase().includes(k));return s.replace(new RegExp(k,"i"),"_____")+" (Answer: "+k+")"});return{terms,qs}}
+const ytLink=t=>"https://www.youtube.com/results?search_query="+encodeURIComponent(t);
+const vcard=v=>`<article class="card"><div class="thumb" style="background:linear-gradient(135deg,hsl(${v.h} 60% 32%),hsl(${(v.h+40)%360} 65% 45%))">${esc(v.s)}</div><div class="b"><h3>${esc(v.t)}</h3><div class="meta">${esc(v.c)} &middot; ${v.d}</div><p>${esc(v.x)}</p><a class="btn" href="${ytLink(v.t)}" target="_blank" rel="noopener">Watch on YouTube</a> <button class="ghost" data-add="${VIDEOS.indexOf(v)}">Add to notebook</button></div></article>`;
+function home(){const subs=["All",...new Set(VIDEOS.map(v=>v.s))];const list=VIDEOS.filter(v=>subj==="All"||v.s===subj);
+return `<section class="hero"><h1>Learn it. Search it. Study it. Turn it in.</h1><p>Browse short lessons, build a study notebook from your own notes, and keep up with class assignments in one place.</p></section>
+<div class="chips" role="group" aria-label="Subjects">${subs.map(s=>`<button class="chip" aria-pressed="${s===subj}" data-subj="${s}">${s}</button>`).join("")}</div><div class="grid">${list.map(vcard).join("")}</div>`}
+function notebook(){const cur=S.sources.find(s=>s.id===S.sel);
+return `<h2>Study notebook</h2><div class="cols"><aside class="panel stack"><h3>Sources</h3>${S.sources.length?S.sources.map(s=>`<div class="item ${s.id===S.sel?"sel":""}"><a href="#notebook" data-sel="${s.id}">${esc(s.title)}</a><button class="ghost" data-del="${s.id}" aria-label="Delete ${esc(s.title)}">Delete</button></div>`).join(""):`<p class="empty">No sources yet. Paste your notes below or add a video summary.</p>`}
+<form id="addsrc" class="stack"><input name="title" placeholder="Source title" required><textarea name="text" rows="6" placeholder="Paste notes, an article or a transcript" required></textarea><button>Add source</button></form></aside>
+<section class="panel stack"><h3>${cur?esc(cur.title):"Select a source"}</h3>
+${cur?`<div class="meta">${words(cur.text).length} words</div><button id="sum">Summarize</button> <button class="ghost" id="gd">Make study guide</button>`:""}
+<form id="askf" class="sf" style="max-width:none;margin:0"><input id="askq" placeholder="Ask a question about all your sources" value="${esc(nbQ)}" aria-label="Question"><button>Ask</button></form>
+<div id="out">${nbOut||`<p class="empty">Summaries, study guides and answers show up here. Answers come from your own sources.</p>`}</div></section></div>`}
+function classes(){const c=S.classes.find(c=>c.id===S.csel)||S.classes[0];
+return `<h2>Classes</h2><div class="cols"><aside class="panel stack"><h3>Your classes</h3>${S.classes.map(k=>`<div class="item ${c&&k.id===c.id?"sel":""}"><a href="#classes" data-c="${k.id}">${esc(k.name)}</a><span class="tag">${esc(k.code)}</span></div>`).join("")}
+<form id="addc" class="stack"><input name="name" placeholder="New class name" required><button>Create class</button></form></aside>
+<section class="panel stack">${c?`<h3>${esc(c.name)} <span class="tag">Join code ${esc(c.code)}</span></h3>${c.work.length?c.work.slice().sort((a,b)=>a.due.localeCompare(b.due)).map(w=>`<div class="item"><label><input type="checkbox" style="width:auto" data-w="${w.id}" ${w.done?"checked":""}> <span class="${w.done?"done":""}">${esc(w.title)}</span></label><span class="tag">Due ${esc(w.due)}</span></div>`).join(""):`<p class="empty">No assignments yet. Add the first one below.</p>`}
+<form id="addw" class="stack"><input name="title" placeholder="Assignment title" required><input name="due" type="date" required><button>Post assignment</button></form>`:`<p class="empty">Create a class to get started.</p>`}</section></div>`}
+function search(q){const k=q.toLowerCase().trim();if(!k)return `<h2>Search</h2><p class="empty">Type a topic above to search videos, notes and assignments.</p>`;
+const m=t=>t.toLowerCase().includes(k);
+const v=VIDEOS.filter(x=>m(x.t+x.x+x.c+x.s));
+const n=S.sources.flatMap(s=>m(s.title)||m(s.text)?[{s,snip:sents(s.text).find(m)||s.text.slice(0,120)}]:[]);
+const w=S.classes.flatMap(c=>c.work.filter(x=>m(x.title)).map(x=>({c,x})));
+return `<h2>Results for &ldquo;${esc(q)}&rdquo;</h2>${v.length||n.length||w.length?"":`<p class="empty">Nothing found. Try a broader word, like a subject name.</p>`}
+${v.length?`<h3>Videos</h3><div class="grid">${v.map(vcard).join("")}</div>`:""}
+${n.length?`<h3 style="margin-top:1.5rem">Notebook</h3>`+n.map(o=>`<div class="panel"><b>${esc(o.s.title)}</b><p>${esc(o.snip)}</p></div>`).join(""):""}
+${w.length?`<h3 style="margin-top:1.5rem">Assignments</h3>`+w.map(o=>`<div class="panel">${esc(o.x.title)} <span class="tag">${esc(o.c.name)} &middot; due ${esc(o.x.due)}</span></div>`).join(""):""}`}
+function route(){const h=(location.hash||"#home").slice(1);const r=["home","notebook","classes"].includes(h)?h:"home";
+if(h==="search"){app.innerHTML=search($("#q").value)}else app.innerHTML={home,notebook,classes}[r]();
+document.querySelectorAll("nav a").forEach(a=>a.toggleAttribute("aria-current",a.dataset.n===r&&h!=="search")||(a.dataset.n===r&&h!=="search"&&a.setAttribute("aria-current","page")));
+document.querySelectorAll("nav a").forEach(a=>{if(a.dataset.n===r&&h!=="search")a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")})}
+const out=h=>{nbOut=h;const o=$("#out");if(o)o.innerHTML=h};
+document.addEventListener("click",e=>{const t=e.target;
+if(t.dataset.subj){subj=t.dataset.subj;route()}
+if(t.dataset.add!==undefined){const v=VIDEOS[+t.dataset.add];S.sources.push({id:Date.now(),title:v.t,text:v.x});S.sel=S.sources.at(-1).id;save();location.hash="#notebook";route()}
+if(t.dataset.sel){e.preventDefault();S.sel=+t.dataset.sel;nbOut="";save();route()}
+if(t.dataset.del){S.sources=S.sources.filter(s=>s.id!==+t.dataset.del);if(S.sel===+t.dataset.del)S.sel=null;save();route()}
+if(t.dataset.c){e.preventDefault();S.csel=+t.dataset.c;save();route()}
+if(t.dataset.w){const c=S.classes.find(c=>c.id===S.csel);const w=c.work.find(w=>w.id===+t.dataset.w);w.done=t.checked;save();route()}
+if(t.id==="sum"){const s=S.sources.find(s=>s.id===S.sel);const r=summarize(s.text);out(r.length?`<h3>Summary</h3><div class="answer">${r.map(esc).join(" ")}</div>`:`<p class="empty">This source is too short to summarize. Add a few full sentences.</p>`)}
+if(t.id==="gd"){const s=S.sources.find(s=>s.id===S.sel);const g=guide(s.text);out(`<h3>Key terms</h3><p>${g.terms.map(x=>`<span class="tag">${esc(x)}</span>`).join(" ")||"None found."}</p><h3>Practice questions</h3>${g.qs.length?"<ol>"+g.qs.map(q=>`<li>${esc(q)}</li>`).join("")+"</ol>":`<p class="empty">Add more text to generate questions.</p>`}`)}
+if(t.id==="theme"){const d=document.documentElement;const dark=d.dataset.theme?d.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches;d.dataset.theme=dark?"light":"dark"}});
+document.addEventListener("submit",e=>{e.preventDefault();const f=e.target,d=Object.fromEntries(new FormData(f));
+if(f.id==="sf"){location.hash="#search";route()}
+if(f.id==="addsrc"){S.sources.push({id:Date.now(),title:d.title,text:d.text});S.sel=S.sources.at(-1).id;nbOut="";save();route()}
+if(f.id==="askf"){nbQ=$("#askq").value;if(!S.sources.length){out(`<p class="empty">Add a source first, then ask a question.</p>`);return}const r=ask(nbQ);out(r.length?`<h3>Answer from your sources</h3>`+r.map(o=>`<div class="answer">${esc(o.s)} <span class="tag">${esc(o.n)}</span></div>`).join('<br>'):`<p class="empty">No match in your sources. Try different keywords.</p>`)}
+if(f.id==="addc"){const id=Date.now();S.classes.push({id,name:d.name,code:Math.random().toString(36).slice(2,5).toUpperCase()+"-"+Math.random().toString(36).slice(2,5).toUpperCase(),work:[]});S.csel=id;save();route()}
+if(f.id==="addw"){const c=S.classes.find(c=>c.id===S.csel);c.work.push({id:Date.now(),title:d.title,due:d.due,done:false});save();route()}});
+addEventListener("hashchange",route);route();
+</script>
+</body>
+</html>
